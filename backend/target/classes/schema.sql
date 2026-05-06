@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS users (
     username    VARCHAR(64) NOT NULL UNIQUE,
     password    VARCHAR(128) NOT NULL,
     role        VARCHAR(32) NOT NULL COMMENT 'admin/user/organization',
-    avatar      VARCHAR(255) DEFAULT 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif',
+    avatar      VARCHAR(255) DEFAULT '/default-avatar.png',
     introduction VARCHAR(255),
     deleted     TINYINT DEFAULT 0,
     created_at  DATETIME DEFAULT CURRENT_TIMESTAMP,

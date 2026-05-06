@@ -6,6 +6,17 @@
         <el-button style="float: right" size="small" @click="$router.back()">返回</el-button>
       </div>
       <el-descriptions v-if="detail.id" :column="2" border>
+        <el-descriptions-item v-if="detail.images" label="物品图片" :span="2">
+          <div v-for="(img, idx) in getImageList(detail.images)" :key="idx" style="display: inline-block; margin-right: 10px; margin-bottom: 10px;">
+            <el-image
+              :src="img"
+              style="width: 120px; height: 120px"
+              fit="cover"
+              :preview-src-list="getImageList(detail.images)"
+              :initial-index="idx"
+            />
+          </div>
+        </el-descriptions-item>
         <el-descriptions-item label="物品名称">{{ detail.title }}</el-descriptions-item>
         <el-descriptions-item label="物品分类">{{ categoryLabel(detail.category) }}</el-descriptions-item>
         <el-descriptions-item label="成色">{{ conditionLabel(detail.conditionLevel) }}</el-descriptions-item>
@@ -91,7 +102,15 @@ export default {
     conditionLabel(val) { return CONDITION_MAP[val] || val || '—' },
     statusLabel(val) { return (STATUS_MAP[val] || {}).label || '未知' },
     statusType(val) { return (STATUS_MAP[val] || {}).type || 'info' },
-    formatTime(val) { return val ? val.replace('T', ' ').substring(0, 16) : '—' }
+    formatTime(val) { return val ? val.replace('T', ' ').substring(0, 16) : '—' },
+    getImageList(images) {
+      if (!images) return []
+      try {
+        return JSON.parse(images)
+      } catch {
+        return []
+      }
+    }
   }
 }
 </script>

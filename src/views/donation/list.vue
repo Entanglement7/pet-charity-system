@@ -6,6 +6,18 @@
         <el-button style="float: right" type="primary" size="small" @click="$router.push('/donation/publish')">发布捐赠</el-button>
       </div>
       <el-table v-loading="loading" :data="list" style="width: 100%" empty-text="暂无捐赠记录">
+        <el-table-column label="图片" width="80">
+          <template slot-scope="scope">
+            <el-image
+              v-if="getFirstImage(scope.row.images)"
+              :src="getFirstImage(scope.row.images)"
+              style="width: 50px; height: 50px"
+              fit="cover"
+              :preview-src-list="getImageList(scope.row.images)"
+            />
+            <i v-else class="el-icon-picture-outline" style="font-size: 24px; color: #C0C4CC"></i>
+          </template>
+        </el-table-column>
         <el-table-column prop="title" label="物品名称" min-width="140" />
         <el-table-column prop="category" label="分类" width="110">
           <template slot-scope="scope">
@@ -95,7 +107,24 @@ export default {
     categoryLabel(val) { return CATEGORY_MAP[val] || val || '—' },
     statusLabel(val) { return (STATUS_MAP[val] || {}).label || '未知' },
     statusType(val) { return (STATUS_MAP[val] || {}).type || 'info' },
-    formatTime(val) { return val ? val.replace('T', ' ').substring(0, 16) : '—' }
+    formatTime(val) { return val ? val.replace('T', ' ').substring(0, 16) : '—' },
+    getFirstImage(images) {
+      if (!images) return ''
+      try {
+        const list = JSON.parse(images)
+        return list && list.length > 0 ? list[0] : ''
+      } catch {
+        return ''
+      }
+    },
+    getImageList(images) {
+      if (!images) return []
+      try {
+        return JSON.parse(images)
+      } catch {
+        return []
+      }
+    }
   }
 }
 </script>

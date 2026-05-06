@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ipconfig)",
+      "Bash(netstat -ano)",
+      "Bash(netsh advfirewall *)",
+      "Bash(taskkill /PID 13488 /F)",
+      "Bash(taskkill /PID 15168 /F)",
+      "Bash(taskkill //PID 13488 //F)",
+      "Bash(taskkill //PID 15168 //F)",
+      "Bash(npm run *)"
+    ]
+  }
+}

@@ -37,6 +37,20 @@
         <el-form-item label="物品描述" prop="description">
           <el-input v-model="form.description" type="textarea" :rows="4" placeholder="请描述物品的详细信息，如品牌、新旧程度等" />
         </el-form-item>
+        <el-form-item label="物品图片">
+          <el-upload
+            :auto-upload="false"
+            :limit="3"
+            :on-change="handleFileChange"
+            :on-remove="handleFileRemove"
+            :file-list="fileList"
+            list-type="picture-card"
+            accept="image/*"
+          >
+            <i class="el-icon-plus"></i>
+          </el-upload>
+          <div class="el-upload__tip">最多上传3张图片，支持jpg、png格式</div>
+        </el-form-item>
         <el-form-item>
           <el-button type="primary" :loading="submitting" @click="submitForm">提 交</el-button>
           <el-button @click="$refs.form.resetFields()">重 置</el-button>
@@ -68,15 +82,47 @@ export default {
         quantity: [{ required: true, message: '请输入数量', trigger: 'blur' }],
         description: [{ required: true, message: '请输入物品描述', trigger: 'blur' }]
       },
-      submitting: false
+      submitting: false,
+      fileList: [],
+      imageBase64List: []
     }
   },
   methods: {
+    handleFileChange(file, fileList) {
+      const isImage = file.raw.type.startsWith('image/')
+      const isLt5M = file.raw.size / 1024 / 1024 < 5
+      if (!isImage) {
+        this.$message.error('只能上传图片文件')
+        fileList.pop()
+        return
+      }
+      if (!isLt5M) {
+        this.$message.error('图片大小不能超过5MB')
+        fileList.pop()
+        return
+      }
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        this.imageBase64List.push(e.target.result)
+      }
+      reader.readAsDataURL(file.raw)
+    },
+    handleFileRemove(file, fileList) {
+      const index = this.fileList.indexOf(file)
+      if (index > -1) {
+        this.imageBase64List.splice(index, 1)
+      }
+      this.fileList = fileList
+    },
     submitForm() {
       this.$refs.form.validate(valid => {
         if (!valid) return
         this.submitting = true
-        publishDonation(this.form)
+        const data = { ...this.form }
+        if (this.imageBase64List.length > 0) {
+          data.images = JSON.stringify(this.imageBase64List)
+        }
+        publishDonation(data)
           .then(() => {
             this.$message.success('发布成功，等待审核')
             this.$router.push('/donation/list')
@@ -87,3 +133,11 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.el-upload__tip {
+  color: #909399;
+  font-size: 12px;
+  margin-top: 5px;
+}
+</style>
