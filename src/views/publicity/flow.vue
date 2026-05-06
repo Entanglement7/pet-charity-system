@@ -5,18 +5,35 @@
         <span>物资流向公示</span>
       </div>
       <el-table v-loading="loading" :data="list" style="width: 100%" empty-text="暂无物流记录">
+        <el-table-column label="类型" width="80">
+          <template slot-scope="scope">
+            <el-tag :type="scope.row.refType === 'donation' ? 'success' : 'primary'" size="small">
+              {{ scope.row.refType === 'donation' ? '捐赠' : '申领' }}
+            </el-tag>
+          </template>
+        </el-table-column>
         <el-table-column prop="itemName" label="物品名称" min-width="130" />
-        <el-table-column prop="donorName" label="捐赠人" width="110" />
-        <el-table-column prop="receiverName" label="接收方" width="120" />
-        <el-table-column prop="receiverAddress" label="接收地址" min-width="160" show-overflow-tooltip />
-        <el-table-column prop="company" label="快递公司" width="110" />
-        <el-table-column prop="trackingNo" label="物流单号" width="150" />
-        <el-table-column label="状态" width="90">
+        <el-table-column label="捐赠人/机构" width="130" prop="donorName" />
+        <el-table-column prop="receiverName" label="接收方" width="110" />
+        <el-table-column prop="receiverAddress" label="接收地址" min-width="150" show-overflow-tooltip />
+        <el-table-column prop="company" label="快递公司" width="100" />
+        <el-table-column prop="trackingNo" label="物流单号" width="140" />
+        <el-table-column label="物流状态" width="90">
           <template slot-scope="scope">
             <el-tag :type="statusType(scope.row.status)" size="small">{{ statusLabel(scope.row.status) }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="发货时间" width="160">
+        <el-table-column label="使用说明" min-width="160">
+          <template slot-scope="scope">
+            <template v-if="scope.row.usageReport">
+              <el-tooltip :content="scope.row.usageReport" placement="top" effect="light">
+                <span style="cursor:pointer;color:#409EFF">{{ truncate(scope.row.usageReport) }}</span>
+              </el-tooltip>
+            </template>
+            <span v-else style="color:#ccc;font-size:12px">—</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="发货时间" width="155">
           <template slot-scope="scope">{{ formatTime(scope.row.shippedAt) }}</template>
         </el-table-column>
       </el-table>
@@ -61,6 +78,7 @@ export default {
     },
     statusLabel(val) { return (STATUS_MAP[val] || {}).label || '未知' },
     statusType(val) { return (STATUS_MAP[val] || {}).type || 'info' },
+    truncate(str) { return str && str.length > 20 ? str.substring(0, 20) + '…' : str },
     formatTime(val) { return val ? val.replace('T', ' ').substring(0, 16) : '—' }
   }
 }

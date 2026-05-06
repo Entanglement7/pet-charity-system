@@ -126,6 +126,62 @@ public class AuditController {
         return R.ok();
     }
 
+    @Operation(summary = "使用情况上报列表")
+    @GetMapping("/usage/list")
+    public R<PageResult<ApplicationAuditVO>> getUsageList(
+            @RequestParam(required = false) Integer usageStatus,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Page<Application> result = applicationService.getUsageReportList(usageStatus, page, size);
+        List<Application> records = result.getRecords();
+
+        Map<Long, String> orgNames = records.stream()
+                .map(Application::getOrganizationId).distinct()
+                .collect(java.util.stream.Collectors.toMap(
+                        id -> id,
+                        id -> { Organization o = organizationMapper.selectById(id); return o != null ? o.getName() : "—"; }
+                ));
+        Map<Long, String> itemTitles = records.stream()
+                .map(Application::getItemId).distinct()
+                .collect(java.util.stream.Collectors.toMap(
+                        id -> id,
+                        id -> { Item i = itemMapper.selectById(id); return i != null ? i.getTitle() : "—"; }
+                ));
+
+        List<ApplicationAuditVO> vos = records.stream().map(a -> {
+            ApplicationAuditVO vo = new ApplicationAuditVO();
+            vo.setId(a.getId());
+            vo.setOrganizationId(a.getOrganizationId());
+            vo.setOrganizationName(orgNames.getOrDefault(a.getOrganizationId(), "—"));
+            vo.setItemId(a.getItemId());
+            vo.setItemTitle(itemTitles.getOrDefault(a.getItemId(), "—"));
+            vo.setQuantity(a.getQuantity());
+            vo.setReason(a.getReason());
+            vo.setStatus(a.getStatus());
+            vo.setUsageReport(a.getUsageReport());
+            vo.setUsageStatus(a.getUsageStatus());
+            vo.setUsageRejectReason(a.getUsageRejectReason());
+            vo.setCreatedAt(a.getCreatedAt());
+            return vo;
+        }).collect(Collectors.toList());
+
+        return R.ok(new PageResult<>(result.getTotal(), vos));
+    }
+
+    @Operation(summary = "审核使用情况")
+    @PostMapping("/usage/{id}")
+    public R<Void> auditUsage(@PathVariable Long id,
+                              @RequestBody Map<String, String> body,
+                              @AuthenticationPrincipal LoginUser loginUser) {
+        if ("approve".equals(body.get("action"))) {
+            applicationService.approveUsageReport(id);
+        } else {
+            applicationService.rejectUsageReport(id, body.get("reason"));
+        }
+        auditService.saveUsageLog(loginUser.getId(), id, body.get("action"), body.get("reason"));
+        return R.ok();
+    }
+
     @Operation(summary = "审核历史")
     @GetMapping("/history")
     public R<PageResult<AuditLog>> getHistory(

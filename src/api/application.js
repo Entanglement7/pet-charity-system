@@ -44,3 +44,11 @@ export function confirmApplicationReceipt(id) {
     method: 'post'
   })
 }
+
+export function submitUsageReport(id, report) {
+  return request({
+    url: `/api/application/usage/${id}`,
+    method: 'post',
+    data: { report }
+  })
+}

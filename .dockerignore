@@ -1,0 +1,32 @@
+# Docker 忽略文件
+
+# 后端
+backend/target/
+backend/.mvn/
+backend/mvnw
+backend/mvnw.cmd
+
+# 前端
+node_modules/
+dist/
+.DS_Store
+*.log
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# 临时文件
+*.tmp
+*.bak
+*.swp
+*~
+
+# 环境配置
+.env
+.env.local
+
+# Git
+.git/
+.gitignore

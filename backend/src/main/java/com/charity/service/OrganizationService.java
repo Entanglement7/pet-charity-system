@@ -42,10 +42,16 @@ public class OrganizationService {
 
     public Organization update(Long userId, Organization updated) {
         Organization org = getByUserId(userId);
+        if (updated.getLicenseUrl() != null && updated.getLicenseUrl().length() > 100000) {
+            throw new BusinessException("资质证明图片过大，请压缩后上传");
+        }
         updated.setId(org.getId());
         updated.setUserId(userId);
         updated.setStatus(org.getStatus());
-        organizationMapper.updateById(updated);
+        int rows = organizationMapper.updateById(updated);
+        if (rows == 0) {
+            throw new BusinessException("更新失败");
+        }
         return organizationMapper.selectById(org.getId());
     }
 

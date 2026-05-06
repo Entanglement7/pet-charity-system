@@ -41,7 +41,7 @@ public class DonationController {
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
             @AuthenticationPrincipal LoginUser loginUser) {
-        Long userId = loginUser.getRole().equals("admin") ? null : loginUser.getId();
+        Long userId = "admin".equals(loginUser.getRole()) ? null : loginUser.getId();
         Page<Donation> result = donationService.list(userId, status, page, size);
         return R.ok(new PageResult<>(result.getTotal(), result.getRecords()));
     }

@@ -79,4 +79,41 @@ public class ApplicationService {
         a.setStatus(4);
         applicationMapper.updateById(a);
     }
+
+    @Transactional
+    public void submitUsageReport(Long id, Long organizationId, String report) {
+        Application a = getDetail(id);
+        if (!a.getOrganizationId().equals(organizationId)) throw new BusinessException("无权操作");
+        if (a.getStatus() != 4) throw new BusinessException("请先确认收货后再填写使用情况");
+        if (a.getUsageStatus() != null && a.getUsageStatus() == 1) throw new BusinessException("使用情况已提交，等待审核中");
+        if (a.getUsageStatus() != null && a.getUsageStatus() == 2) throw new BusinessException("使用情况已公示");
+        a.setUsageReport(report);
+        a.setUsageStatus(1);
+        applicationMapper.updateById(a);
+    }
+
+    @Transactional
+    public void approveUsageReport(Long id) {
+        Application a = getDetail(id);
+        if (a.getUsageStatus() == null || a.getUsageStatus() != 1) throw new BusinessException("当前状态无法审核");
+        a.setUsageStatus(2);
+        applicationMapper.updateById(a);
+    }
+
+    @Transactional
+    public void rejectUsageReport(Long id, String reason) {
+        Application a = getDetail(id);
+        if (a.getUsageStatus() == null || a.getUsageStatus() != 1) throw new BusinessException("当前状态无法审核");
+        a.setUsageStatus(3);
+        a.setUsageRejectReason(reason);
+        applicationMapper.updateById(a);
+    }
+
+    public Page<Application> getUsageReportList(Integer usageStatus, int page, int size) {
+        LambdaQueryWrapper<Application> wrapper = new LambdaQueryWrapper<Application>()
+                .eq(Application::getStatus, 4)
+                .eq(usageStatus != null, Application::getUsageStatus, usageStatus)
+                .orderByDesc(Application::getUpdatedAt);
+        return applicationMapper.selectPage(new Page<>(page, size), wrapper);
+    }
 }

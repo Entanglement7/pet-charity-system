@@ -81,8 +81,18 @@ public class PointsController {
     @PutMapping("/exchange/item/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public R<ExchangeItem> updateExchangeItem(@PathVariable Long id, @RequestBody ExchangeItem item) {
+        ExchangeItem existing = exchangeItemMapper.selectById(id);
+        if (existing == null) {
+            return R.fail(40400, "兑换物品不存在");
+        }
+        if (item.getImage() != null && item.getImage().length() > 100000) {
+            return R.fail(40000, "图片过大，请压缩后上传");
+        }
         item.setId(id);
-        exchangeItemMapper.updateById(item);
+        int rows = exchangeItemMapper.updateById(item);
+        if (rows == 0) {
+            return R.fail(50000, "更新失败");
+        }
         return R.ok(exchangeItemMapper.selectById(id));
     }
 

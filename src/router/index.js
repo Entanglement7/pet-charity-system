@@ -261,6 +261,12 @@ export const asyncRoutes = [
         component: () => import('@/views/application/records'),
         name: 'ApplicationRecords',
         meta: { title: '申领记录', icon: 'documentation', roles: ['organization'] }
+      },
+      {
+        path: 'manage',
+        component: () => import('@/views/application/manage'),
+        name: 'ApplicationManage',
+        meta: { title: '申领管理', icon: 'setting', roles: ['admin'] }
       }
     ]
   },

@@ -13,5 +13,8 @@ public class ApplicationRecordVO {
     private String reason;
     private Integer status;
     private String rejectReason;
+    private String usageReport;
+    private Integer usageStatus;
+    private String usageRejectReason;
     private LocalDateTime createdAt;
 }

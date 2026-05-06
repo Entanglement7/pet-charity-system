@@ -17,5 +17,6 @@ public class FlowVO {
     private Integer status;
     private LocalDateTime shippedAt;
     private LocalDateTime receivedAt;
+    private String usageReport;
     private LocalDateTime createdAt;
 }

@@ -84,6 +84,9 @@ public class ApplicationController {
             vo.setReason(a.getReason());
             vo.setStatus(a.getStatus());
             vo.setRejectReason(a.getRejectReason());
+            vo.setUsageReport(a.getUsageReport());
+            vo.setUsageStatus(a.getUsageStatus());
+            vo.setUsageRejectReason(a.getUsageRejectReason());
             vo.setCreatedAt(a.getCreatedAt());
             return vo;
         }).collect(Collectors.toList());
@@ -99,7 +102,7 @@ public class ApplicationController {
 
     @Operation(summary = "申领物流信息")
     @GetMapping("/logistics/{id}")
-    @PreAuthorize("hasRole('ORGANIZATION')")
+    @PreAuthorize("hasAnyRole('ORGANIZATION', 'ADMIN')")
     public R<Logistics> getLogistics(@PathVariable Long id) {
         return R.ok(logisticsService.getByRef("application", id));
     }
@@ -111,6 +114,17 @@ public class ApplicationController {
                                   @AuthenticationPrincipal LoginUser loginUser) {
         Organization org = organizationService.getByUserId(loginUser.getId());
         applicationService.confirmReceipt(id, org.getId());
+        return R.ok();
+    }
+
+    @Operation(summary = "提交物资使用情况")
+    @PostMapping("/usage/{id}")
+    @PreAuthorize("hasRole('ORGANIZATION')")
+    public R<Void> submitUsage(@PathVariable Long id,
+                               @RequestBody Map<String, String> body,
+                               @AuthenticationPrincipal LoginUser loginUser) {
+        Organization org = organizationService.getByUserId(loginUser.getId());
+        applicationService.submitUsageReport(id, org.getId(), body.get("report"));
         return R.ok();
     }
 }

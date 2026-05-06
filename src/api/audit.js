@@ -48,6 +48,22 @@ export function auditApplication(id, data) {
   })
 }
 
+export function getUsageReportList(params) {
+  return request({
+    url: '/api/audit/usage/list',
+    method: 'get',
+    params
+  })
+}
+
+export function auditUsageReport(id, data) {
+  return request({
+    url: `/api/audit/usage/${id}`,
+    method: 'post',
+    data
+  })
+}
+
 export function getAuditHistory(params) {
   return request({
     url: '/api/audit/history',

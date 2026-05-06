@@ -39,8 +39,9 @@
         </el-form-item>
         <el-form-item label="物品图片">
           <el-upload
+            :class="{ 'hide-upload-btn': fileList.length >= 1 }"
             :auto-upload="false"
-            :limit="3"
+            :limit="1"
             :on-change="handleFileChange"
             :on-remove="handleFileRemove"
             :file-list="fileList"
@@ -49,7 +50,6 @@
           >
             <i class="el-icon-plus"></i>
           </el-upload>
-          <div class="el-upload__tip">最多上传3张图片，支持jpg、png格式</div>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" :loading="submitting" @click="submitForm">提 交</el-button>
@@ -101,9 +101,10 @@ export default {
         fileList.pop()
         return
       }
+      this.fileList = fileList
       const reader = new FileReader()
       reader.onload = (e) => {
-        this.imageBase64List.push(e.target.result)
+        this.imageBase64List = [e.target.result]
       }
       reader.readAsDataURL(file.raw)
     },
@@ -135,9 +136,7 @@ export default {
 </script>
 
 <style scoped>
-.el-upload__tip {
-  color: #909399;
-  font-size: 12px;
-  margin-top: 5px;
+.hide-upload-btn /deep/ .el-upload--picture-card {
+  display: none;
 }
 </style>

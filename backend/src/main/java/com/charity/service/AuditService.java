@@ -63,6 +63,10 @@ public class AuditService {
         return auditLogMapper.selectPage(new Page<>(page, size), wrapper);
     }
 
+    public void saveUsageLog(Long auditorId, Long refId, String action, String reason) {
+        saveLog(auditorId, "usage_report", refId, action, reason);
+    }
+
     private void saveLog(Long auditorId, String refType, Long refId, String action, String reason) {
         AuditLog log = new AuditLog();
         log.setAuditorId(auditorId);
