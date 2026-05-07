@@ -51,7 +51,10 @@
       "Bash(echo \"Backend started with PID: $!\")",
       "Bash(xargs grep -l \"logistics\\\\|物流\")",
       "Bash(xargs grep -l \"申领\")",
-      "Bash(chmod +x *)"
+      "Bash(chmod +x *)",
+      "Bash(mvn spring-boot:run)",
+      "Bash(taskkill *)",
+      "Bash(mysqldump *)"
     ]
   }
 }
